@@ -2,6 +2,9 @@ const sqlite3 = require('sqlite3'),
       fs = require('fs');
 
 function randomInt(min, max) {
+  if(max <= min)
+    throw new Error("Invalid Inputs!");
+
   return Math.floor(Math.random() * (max - min) + min);
 };
 
@@ -18,7 +21,7 @@ function db(dbPath){
     if (err) {
       console.log("creating new DB at: " + this.dbPath);
       // In this case we need to also initialize it
-      this.sqldb.run("CREATE TABLE USERS(ID INT PRIMARY KEY NOT NULL,USERNAME TEXT NOT NULL,"
+      this.sqldb.run("CREATE TABLE USERS(ID INT PRIMARY KEY NOT NULL,USERNAME TEXT NOT NULL UNIQUE,"
                   +"IV TEXT NOT NULL, SECRET TEXT NOT NULL);");
     }
   });
@@ -31,7 +34,7 @@ db.prototype.close = function close(){
 
 db.prototype.addUser = function addUser(username, iv, sharedSecret, next) {
     if(!this.sqldb.open)
-      next(Error("db not open"),null)
+      return next("db not open",null);
 
     this.sqldb.run("INSERT INTO USERS(ID,USERNAME,IV,SECRET) VALUES(?,?,?,?)", randomInt(1, 65535), username, iv, sharedSecret, next);
 }

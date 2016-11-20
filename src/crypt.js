@@ -1,10 +1,10 @@
 const crypto = require('crypto'),
-      process = require('process'),
-      config = require(process.cwd() + '/config.js'),
-      db = require(process.cwd() + '/src/db/db.js'),
+      cwd = require('process').cwd(),
+      config = require(cwd + '/config.js'),
       alg = 'aes-256-gcm';
 
-var serverKey = config.serverKey; // Need to use var to work with `rewire` testing :(
+var serverKey = config.serverKey, // Need to use var to work with `rewire` testing :(
+    db = require(cwd + '/src/db/db.js')(cwd + '/src/db/users.db');
 
 function encrypt(ptext,iv,aad){
   var cipher = crypto.createCipheriv(alg, Buffer.from(serverKey,'hex')
@@ -39,11 +39,15 @@ function decrypt(ctext,iv,tag,aad){
   }
 }
 
-var createNewUser = function(username){
-  db.getUser(username,(err,iv,secret) => {
-    if(err !== "name not found")
-      throw "user exists"
-  });
+var createNewUser = function(username,done){
+  var iv = crypto.randomBytes(12).toString('hex');
+  var sharedSecret = crypto.randomBytes(20).toString('hex');
+  db.addUser(username, iv, sharedSecret, (err,result) => {
+    if(err)
+      throw new Error("failed to create user" + username)
+
+    done(result);
+  })
 }
 
 module.exports = {
