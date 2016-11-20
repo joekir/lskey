@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en-US" ng-app="keyworker-demo">
+<html lang="en-US" ng-app="LsKey">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -44,16 +44,6 @@
           <input ng-enabled="workerSupported" ng-model="formData.email" type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
           <button ng-enabled="workerSupported" class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
   </form>
-  <br>
-  <p ng-hide="workerSupported">Sorry, your browser doesn't support Web Workers we can't log you in.</p>
-  <!--script>
-    var worker = new Worker('/js/webWorker/keyWorker.js');
-    worker.onmessage = function (oEvent) {
-      console.log("Worker said : " + oEvent.data);
-    };
-    worker.postMessage('decrypt');
-
-  </script-->
 </div> <!-- container -->
 </body>
 </html>
