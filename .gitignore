@@ -1,6 +1,5 @@
 # Project Specific
-/test/*.db
-
+*.db
 
 # Created by https://www.gitignore.io/api/node
 

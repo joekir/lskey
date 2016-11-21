@@ -8,6 +8,10 @@ app.controller('auth', function($scope,$http) {
   if($scope.blob)
     $http.defaults.headers.common['X-LsKey'] = $scope.blob;
 
+  $scope.username = localStorage.getItem('username');
+  if($scope.username)
+    $http.defaults.headers.common['X-LsUser'] = $scope.username;
+
   $scope.submit = function() {
       $http({
         method: 'POST',
@@ -16,8 +20,12 @@ app.controller('auth', function($scope,$http) {
           email : $scope.formData.email
         }
       }).then(function successCallback(res) {
-        console.log("adding data to localstorage: %s", res.data.blob);
+        console.log("adding to localstorage blob : %s and username: %s"
+                              ,res.data.blob, res.data.username);
+
         localStorage.setItem('blob', res.data.blob);
+        localStorage.setItem('username', res.data.username);
+
         window.location.href = res.data.redir;
       }, function errorCallback(res) {
         console.log(res);
@@ -29,6 +37,10 @@ app.controller('auth', function($scope,$http) {
     if(result.key === 'blob'){
       $scope.blob = result.newValue;
       $http.defaults.headers.common['X-LsKey'] = $scope.blob;
+    }
+    if(result.key === 'username'){
+      $scope.username = result.newValue;
+      $http.defaults.headers.common['X-LsUser'] = $scope.username;
     }
   });
 

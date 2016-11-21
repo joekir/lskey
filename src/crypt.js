@@ -31,7 +31,6 @@ function decrypt(ctext,iv,tag,aad){
   decipher.setAuthTag(Buffer.from(tag,'hex'));
   decipher.setAAD(Buffer.from(aad,'utf8'));
 
-
   var decrypted = decipher.update(ctext,'hex','utf8');
   decrypted += decipher.final('utf8');
   return {
@@ -43,13 +42,35 @@ var createNewUser = function(username,done){
   var iv = crypto.randomBytes(12).toString('hex');
   var sharedSecret = crypto.randomBytes(20).toString('hex');
   db.addUser(username, iv, sharedSecret, (err,result) => {
-    if(err)
-      throw new Error("failed to create user" + username)
+    if (err)
+      return done(new Error("Unable to create user: " + username),null);
 
-    done(result);
-  })
+    done(null, encrypt(sharedSecret,iv,username));
+  });
 }
 
+/*
+  These errors are not side-channel proof.
+*/
+var validateUser = function(username,ciphertext,tag,done){
+  db.getUser(username,(err,res) => {
+    if(err)
+      return done(false);
+
+    try {
+      var result = decrypt(ciphertext,res.iv,tag,username);
+      if(result.ptext === res.sharedSecret)
+        return done(true);
+    }
+    catch (err){
+      console.log(err);
+    }
+
+    return done(false);
+  });
+};
+
 module.exports = {
-  createNewUser
+  createNewUser,
+  validateUser
 }

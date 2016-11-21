@@ -50,10 +50,22 @@ describe('crypt.js', function() {
     });
   });
 
-  describe('#createUser(username)', function(){
-    it('should add a new unique user to the database', function(){
-      var result = crypt.createNewUser('new-cryptUser',(res) => {
+  describe('#createUser(username)', function(done){
+    var testUser = 'new-cryptUser';
+
+    it('should add a new unique user to the database', function(done){
+      crypt.createNewUser(testUser, function (err,res) {
+        assert.equal(err,null);
         console.log(res);
+        assert.notEqual(res,null);
+        done();
+      });
+    });
+
+    it('a duplicate user should throw an error', function(done){
+      crypt.createNewUser(testUser, function (err,res) {
+        assert(/Unable to create user/.test(err));
+        done();
       });
     });
   });
