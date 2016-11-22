@@ -3,9 +3,10 @@ const express = require('express'),
 
 var auth = require('./middleware/auth');
 
-router.get('/',auth,(req, res, next) => {
-  console.log('requesting home')
-  res.sendFile("./public/home.html");
+router.post('/',auth,(req, res) => {
+  console.log('in post request')
+  res.type('json');
+  res.status(200).send({ redir: '/home' })
 });
 
 module.exports = router;
